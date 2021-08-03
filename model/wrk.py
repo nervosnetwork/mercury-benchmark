@@ -54,10 +54,6 @@ class WrkGroup(WrkScript):
 
                 collection_group.get(x.collections).append(x)
 
-        # todo 重构为根据 key 来决定表头内容
-        # header = "|  | 1min | 5min | 15min |\n| --- | --- | --- | --- |\n"
-        # table = table.join(header)
-
         header = "|  | "
         header_separator = "| --- |"
         for x in seconds:
@@ -120,14 +116,16 @@ class Wrk(WrkScript):
 
 
 class WrkFactory(object):
-    # todo 重构为读取文件
-    script_names = ["get_balance.lua"]
+    script_names = []
     script_dir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "script")
     wrk_instance = []
 
     @classmethod
     def get_instance(cls, wrk_seconds=[60, 300, 900], wrk_collections=[300, 1000]):
         if len(cls.wrk_instance) == 0:
+
+            cls.script_names = os.listdir(cls.script_dir)
+
             for x in cls.script_names:
                 group = WrkGroup(name=x, script_name=x, script_dir=cls.script_dir)
                 cls.wrk_instance.append(group)
