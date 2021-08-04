@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from model.config import WrkConfig
@@ -118,33 +119,65 @@ class WrkGroup(WrkScript):
                 x.run()
 
 
-class WrkFactory(object):
+class BenchmarkSuite:
+    def __init__(self, wrk_group_instance):
+        self.__wrk_group_instance = wrk_group_instance
+        self.__now = datetime.datetime.now()
+
+    def exec(self):
+        data = ""
+        for x in self.__wrk_group_instance:
+            if isinstance(x, WrkGroup):
+                x.run()
+                data += x.get_markdown()
+
+        self.__record_log(data)
+
+    def __record_log(self, data):
+        self.__check_dir()
+
+        now = datetime.datetime.now()
+        benchmark_logs = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
+                                      "benchmark_logs/" + str(now) + ".md")
+        with open(benchmark_logs, 'w') as f:
+            f.write(data)
+
+    def __check_dir(self):
+        log_dir_path = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "benchmark_logs")
+        if not os.path.exists(log_dir_path):
+            os.makedirs(log_dir_path)
+
+
+class BenchmarkSuiteFactory(object):
     script_names = []
+    benchmarkSuite = None
     script_dir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "script")
-    wrk_instance = []
 
     @classmethod
-    def get_instance_by_config(cls, config=WrkConfig) -> []:
-        if len(cls.wrk_instance) == 0:
-            cls.__get_wrk_instance(config)
+    def get_instance_by_config(cls, config=WrkConfig):
+        if cls.benchmarkSuite is None:
+            cls.__get_wrk_group_instance(config)
 
-        return cls.wrk_instance
-
-    @classmethod
-    def get_instance(cls) -> []:
-        if len(cls.wrk_instance) == 0:
-            cls.__get_wrk_instance(WrkConfig.read_config())
-
-        return cls.wrk_instance
+        return cls.benchmarkSuite
 
     @classmethod
-    def __get_wrk_instance(cls, config=WrkConfig):
+    def get_instance(cls):
+        if cls.benchmarkSuite is None:
+            cls.__get_wrk_group_instance(WrkConfig.read_config())
+
+        return cls.benchmarkSuite
+
+    @classmethod
+    def __get_wrk_group_instance(cls, config=WrkConfig):
+        wrk_group_instance = []
         cls.script_names = os.listdir(cls.script_dir)
         for x in cls.script_names:
             group = WrkGroup(name=x, script_name=x, script_dir=cls.script_dir, config=config)
-            cls.wrk_instance.append(group)
+            wrk_group_instance.append(group)
             for y in config.seconds:
                 for z in config.collections:
                     wrk = Wrk(seconds=y, collections=z, script_name=x, script_dir=cls.script_dir,
                               config=config)
                     group.append(wrk)
+
+        cls.benchmarkSuite = BenchmarkSuite(wrk_group_instance=wrk_group_instance)

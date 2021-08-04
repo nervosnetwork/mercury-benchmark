@@ -1,7 +1,7 @@
 import unittest
 
 from model.config import WrkConfig
-from model.wrk import WrkFactory, WrkGroup
+from model.wrk import BenchmarkSuiteFactory, WrkGroup
 
 
 class WrkTest(unittest.TestCase):
@@ -13,16 +13,14 @@ class WrkTest(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_wak(self):
-        wrk = WrkFactory.get_instance_by_config(self.config)
-        for x in wrk:
-            if isinstance(x, WrkGroup):
-                x.run()
-                print(x.get_markdown())
+    def test_benchmark_suitek(self):
+        benchmark_suite = BenchmarkSuiteFactory.get_instance_by_config(self.config)
+        benchmark_suite.exec()
 
-    def test_config(self):
-        wrk = WrkFactory.get_instance()
-        for x in wrk:
-            if isinstance(x, WrkGroup):
-                x.run()
-                print(x.get_markdown())
+    @staticmethod
+    def test_benchmark_suite_by_config():
+        benchmark_suite = BenchmarkSuiteFactory.get_instance()
+        benchmark_suite.exec()
+
+
+
