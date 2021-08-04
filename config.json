@@ -1,0 +1,7 @@
+{
+  "node_url": "http://8.210.169.63:8116",
+  "seconds": [60, 300, 900],
+  "collections": [300, 1000],
+  "threads": 16,
+  "timeout": 1
+}
