@@ -155,13 +155,6 @@ class BenchmarkSuiteFactory(object):
     script_dir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "script")
 
     @classmethod
-    def get_instance_by_config(cls, config=WrkConfig):
-        if cls.benchmarkSuite is None:
-            cls.__get_wrk_group_instance(config)
-
-        return cls.benchmarkSuite
-
-    @classmethod
     def get_instance(cls):
         if cls.benchmarkSuite is None:
             cls.__get_wrk_group_instance(WrkConfig.read_config())
@@ -169,9 +162,35 @@ class BenchmarkSuiteFactory(object):
         return cls.benchmarkSuite
 
     @classmethod
-    def __get_wrk_group_instance(cls, config=WrkConfig):
+    def get_instance_by_config(cls, config=WrkConfig):
+        if cls.benchmarkSuite is None:
+            cls.__get_wrk_group_instance(config=config)
+
+        return cls.benchmarkSuite
+
+    @classmethod
+    def get_instance_by_scripts(cls, scripts=[]):
+        if cls.benchmarkSuite is None:
+            cls.__get_wrk_group_instance(config=WrkConfig.read_config(), scripts=scripts)
+
+        return cls.benchmarkSuite
+
+    @classmethod
+    def get_instance_by_config_and_scripts(cls, config=WrkConfig, scripts=[]):
+        if cls.benchmarkSuite is None:
+            cls.__get_wrk_group_instance(config=config, scripts=scripts)
+
+        return cls.benchmarkSuite
+
+    @classmethod
+    def __get_wrk_group_instance(cls, config=WrkConfig, scripts=[]):
         wrk_group_instance = []
-        cls.script_names = os.listdir(cls.script_dir)
+        if len(scripts) == 0:
+            cls.script_names = os.listdir(cls.script_dir)
+        else:
+            for x in scripts:
+                cls.script_names.append(x)
+
         for x in cls.script_names:
             group = WrkGroup(name=x, script_name=x, script_dir=cls.script_dir, config=config)
             wrk_group_instance.append(group)

@@ -9,12 +9,18 @@ class WrkTest(unittest.TestCase):
     def setUp(self):
         config = WrkConfig(node_url="http://127.0.0.1:8116", seconds=[10], collections=[300], threads=16, timeout=1)
         self.config = config
+        scripts = ["build_smart_transfer_transaction.lua", "build_withdraw_transaction.lua"]
+        self.scripts = scripts
 
     def tearDown(self):
         pass
 
-    def test_benchmark_suitek(self):
+    def test_benchmark_suitek1(self):
         benchmark_suite = BenchmarkSuiteFactory.get_instance_by_config(self.config)
+        benchmark_suite.exec()
+
+    def test_benchmark_suitek2(self):
+        benchmark_suite = BenchmarkSuiteFactory.get_instance_by_config_and_scripts(self.config, self.scripts)
         benchmark_suite.exec()
 
     @staticmethod
