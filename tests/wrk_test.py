@@ -7,7 +7,7 @@ from model.wrk import BenchmarkSuiteFactory, WrkGroup
 class WrkTest(unittest.TestCase):
 
     def setUp(self):
-        config = WrkConfig(node_url="http://8.210.169.63:8116", seconds=[10], collections=[300], threads=16, timeout=1)
+        config = WrkConfig(node_url="http://127.0.0.1:8116", seconds=[10], collections=[300], threads=16, timeout=1)
         self.config = config
 
     def tearDown(self):

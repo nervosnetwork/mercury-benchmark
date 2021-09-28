@@ -1,5 +1,5 @@
 {
-  "node_url": "http://8.210.169.63:8116",
+  "node_url": "http://127.0.0.1:8116",
   "seconds": [60, 300, 900],
   "collections": [300, 1000],
   "threads": 16,

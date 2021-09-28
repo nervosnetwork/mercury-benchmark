@@ -62,7 +62,7 @@ class WrkGroup(WrkScript):
         self.__name = name
         self.__group = []
         self.__markdown = "## {}\n### 压测脚本\n```lua\n{}\n```\n\n### 压测命令\n```shell\n$ {}\n" \
-                          "```\n\n {} \n\n### 压测结果\n {} \n\n"
+                          "```\n\n {} \n\n### 压测结果\n {} \n\n Implementation time period: {} \n\n"
 
         super(WrkGroup, self).__init__(script_name, script_dir, config)
 
@@ -76,13 +76,15 @@ class WrkGroup(WrkScript):
         self.__group.append(wrk)
 
     def get_markdown(self):
+        startTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         data = ""
         for x in self.__group:
             if isinstance(x, Wrk):
                 data = data + x.get_markdown()
+        endTime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         return self.__markdown.format(self.__name, self.get_script_file(), self.get_cmd(), data,
-                                      self.get_table())
+                               self.get_table(), startTime + " ~ " + endTime)
 
     def get_table(self):
         collection_group = {}
@@ -120,9 +122,9 @@ class WrkGroup(WrkScript):
 
 
 class BenchmarkSuite:
-    def __init__(self, wrk_group_instance):
+    def __init__(self, wrk_group_instance=[]):
         self.__wrk_group_instance = wrk_group_instance
-        self.__now = datetime.datetime.now()
+        self.__now = datetime.datetime.now().strftime('%Y-%m-%d-%H.%M.%S.%f')
 
     def exec(self):
         data = ""
@@ -136,9 +138,8 @@ class BenchmarkSuite:
     def __record_log(self, data):
         self.__check_dir()
 
-        now = datetime.datetime.now()
         benchmark_logs = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))),
-                                      "benchmark_logs/" + str(now) + ".md")
+                                      "benchmark_logs/" + str(self.__now) + ".md")
         with open(benchmark_logs, 'w') as f:
             f.write(data)
 
