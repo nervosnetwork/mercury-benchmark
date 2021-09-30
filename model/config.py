@@ -1,22 +1,25 @@
 import json
 import os
 
-
 class WrkConfig(object):
-    def __init__(self, node_url, seconds, collections, threads, timeout):
+    def __init__(self, node_url, seconds, collections, threads, timeout, script_dir):
         self.__node_url = node_url
         self.__seconds = seconds
         self.__collections = collections
         self.__threads = threads
         self.__timeout = timeout
+        self.__script_dir = script_dir
 
     @classmethod
-    def read_config(cls):
+    def read_config(cls, network="testnet"):
         path = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "config.json")
         with open(path, "r") as f:
-            json_config = json.load(f)
+            configs = json.load(f)
 
-        return WrkConfig(**json_config)
+        if network not in configs:
+            print("unsupported network type " + network)
+
+        return WrkConfig(**configs[network])
 
     @property
     def node_url(self) -> str:
@@ -38,3 +41,6 @@ class WrkConfig(object):
     def timeout(self) -> int:
         return self.__timeout
 
+    @property
+    def script_dir(self) -> str:
+        return self.__script_dir

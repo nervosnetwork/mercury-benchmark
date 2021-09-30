@@ -150,14 +150,13 @@ class BenchmarkSuite:
 
 
 class BenchmarkSuiteFactory(object):
-    script_names = []
     benchmarkSuite = None
-    script_dir = os.path.join(os.path.abspath(os.path.dirname(os.path.dirname(__file__))), "script")
+    base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, network):
         if cls.benchmarkSuite is None:
-            cls.__get_wrk_group_instance(WrkConfig.read_config())
+            cls.__get_wrk_group_instance(WrkConfig.read_config(network))
 
         return cls.benchmarkSuite
 
@@ -169,9 +168,9 @@ class BenchmarkSuiteFactory(object):
         return cls.benchmarkSuite
 
     @classmethod
-    def get_instance_by_scripts(cls, scripts=[]):
+    def get_instance_by_scripts(cls, network, scripts=[]):
         if cls.benchmarkSuite is None:
-            cls.__get_wrk_group_instance(config=WrkConfig.read_config(), scripts=scripts)
+            cls.__get_wrk_group_instance(config=WrkConfig.read_config(network), scripts=scripts)
 
         return cls.benchmarkSuite
 
@@ -184,20 +183,22 @@ class BenchmarkSuiteFactory(object):
 
     @classmethod
     def __get_wrk_group_instance(cls, config=WrkConfig, scripts=[]):
+        script_dir = os.path.join(cls.base_dir, config.script_dir)
+
         wrk_group_instance = []
+        script_names = []
         if len(scripts) == 0:
-            cls.script_names = os.listdir(cls.script_dir)
+            script_names = os.listdir(script_dir)
         else:
             for x in scripts:
-                cls.script_names.append(x)
+                script_names.append(x)
 
-        for x in cls.script_names:
-            group = WrkGroup(name=x, script_name=x, script_dir=cls.script_dir, config=config)
+        for x in script_names:
+            group = WrkGroup(name=x, script_name=x, script_dir=script_dir, config=config)
             wrk_group_instance.append(group)
             for y in config.seconds:
                 for z in config.collections:
-                    wrk = Wrk(seconds=y, collections=z, script_name=x, script_dir=cls.script_dir,
-                              config=config)
+                    wrk = Wrk(seconds=y, collections=z, script_name=x, script_dir=script_dir, config=config)
                     group.append(wrk)
 
         cls.benchmarkSuite = BenchmarkSuite(wrk_group_instance=wrk_group_instance)

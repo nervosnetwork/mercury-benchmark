@@ -1,13 +1,13 @@
 import unittest
 
 from model.config import WrkConfig
-from model.wrk import BenchmarkSuiteFactory, WrkGroup
+from model.wrk import BenchmarkSuiteFactory
 
 
 class WrkTest(unittest.TestCase):
 
     def setUp(self):
-        config = WrkConfig(node_url="http://127.0.0.1:8116", seconds=[10], collections=[300], threads=16, timeout=1)
+        config = WrkConfig(node_url="http://127.0.0.1:8116", seconds=[10], collections=[300], threads=16, timeout=1, script_dir="script/testnet")
         self.config = config
         scripts = ["build_smart_transfer_transaction.lua", "build_withdraw_transaction.lua"]
         self.scripts = scripts
@@ -25,8 +25,5 @@ class WrkTest(unittest.TestCase):
 
     @staticmethod
     def test_benchmark_suite_by_config():
-        benchmark_suite = BenchmarkSuiteFactory.get_instance()
+        benchmark_suite = BenchmarkSuiteFactory.get_instance("testnet")
         benchmark_suite.exec()
-
-
-
