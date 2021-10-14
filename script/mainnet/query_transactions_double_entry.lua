@@ -5,5 +5,6 @@ wrk.headers["Content-Type"] = "application/json"
 function response(status, headers, body)
     if (string.find(body, '"error"')) then
         print('error, resp: ', body)
+        wrk.thread:stop()
     end
 end

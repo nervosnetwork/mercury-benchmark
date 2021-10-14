@@ -7,7 +7,7 @@ from model.wrk import BenchmarkSuiteFactory
 class WrkTest(unittest.TestCase):
 
     def setUp(self):
-        config = WrkConfig(node_url="http://127.0.0.1:8116", seconds=[10], collections=[300], threads=16, timeout=1, script_dir="script/testnet")
+        config = WrkConfig(node_url="http://127.0.0.1:8116", seconds=[10], collections=[300], threads=16, timeout=1, script_dir="script/mainnet")
         self.config = config
         scripts = ["get_spent_transaction_double_entry.lua"]
         self.scripts = scripts
